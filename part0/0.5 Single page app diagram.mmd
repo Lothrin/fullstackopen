@@ -1,0 +1,11 @@
+sequenceDiagram
+    participant Browser
+    participant Server
+
+    Browser->>Server: Request Notes Page
+    Server-->>Browser: Serve HTML with JS Code
+    Note over Browser: Browser loads HTML & executes JS code
+    Browser->>Server: Fetch Notes as JSON
+    Server-->>Browser: Send JSON Data
+    Browser->>Browser: Create HTML for Notes using DOM API
+    Note over Browser: Browser displays notes on the page
