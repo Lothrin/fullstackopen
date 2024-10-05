@@ -11,9 +11,9 @@ const Header = (props) => {
 const Button = (props) => {
   return (
     <>
-    <button onClick={props.onClick}>
-      {props.text}
-    </button>
+      <button onClick={props.onClick}>
+        {props.text}
+      </button>
     </>
   )
 }
@@ -21,17 +21,27 @@ const Button = (props) => {
 const Display = (props) => {
   return (
     <p>
-      {props.text} = {props.value}
+      {props.text}  {props.value}
     </p>
   )
 }
 
 const Statistics = (props) => {
+  if (props.good + props.neutral + props.bad == 0) { 
+    return (
+    <>
+    <Display text='No feedback given'/>
+    </>
+  ) 
+} 
   return (
     <>
-    <Display text='all' value={props.good + props.neutral + props.bad}/>
-    <Display text='average' value={(props.good - props.bad) / (props.good + props.neutral + props.bad)}/>
-    <Display text='positive' value={props.good / (props.good + props.neutral + props.bad) * 100 + '%'}/>
+      <Display text='good' value={props.good} />
+      <Display text='neutral' value={props.neutral} />
+      <Display text='bad' value={props.bad} />
+      <Display text='all' value={props.good + props.neutral + props.bad} />
+      <Display text='average' value={(props.good - props.bad) / (props.good + props.neutral + props.bad)} />
+      <Display text='positive' value={props.good / (props.good + props.neutral + props.bad) * 100 + '%'} />
     </>
   )
 }
@@ -42,7 +52,7 @@ const App = () => {
   const [good, setGood] = useState(0)
   const [neutral, setNeutral] = useState(0)
   const [bad, setBad] = useState(0)
-  
+
   const setGoodHandler = () => {
     setGood(good + 1)
   }
@@ -54,15 +64,12 @@ const App = () => {
   }
   return (
     <div>
-      <Header text='give feedback'/>
-      <Button onClick={setGoodHandler} text='good'/>
-      <Button onClick={setNeutralHandler} text='neutral'/>
-      <Button onClick={setBadHandler} text='bad'/>
-      <Header text='statistics'/>
-      <Display text='good' value={good}/>
-      <Display text='neutral' value={neutral}/>
-      <Display text='bad' value={bad}/>
-      <Statistics good={good} neutral={neutral} bad={bad}/>
+      <Header text='give feedback' />
+      <Button onClick={setGoodHandler} text='good' />
+      <Button onClick={setNeutralHandler} text='neutral' />
+      <Button onClick={setBadHandler} text='bad' />
+      <Header text='statistics' />
+      <Statistics good={good} neutral={neutral} bad={bad} />
     </div>
   )
 }
