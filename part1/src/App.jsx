@@ -1,12 +1,12 @@
 import { useState } from 'react'
 
-// const Header = (props) => {
-//   return (
-//     <h1>
-//       {props.text}
-//     </h1>
-//   )
-// }
+const Header = (props) => {
+  return (
+    <h1>
+      {props.text}
+    </h1>
+  )
+}
 
 // const Button = (props) => {
 //   return (
@@ -117,16 +117,22 @@ const App = () => {
     setPoints(copy)
     
   }
+
+  const maxVotesIndex = points.indexOf(Math.max(...points))
   return (
     <div>
       {/* <Header text='give feedback' />
       <Button onClickBad={setBadHandler} onClickNeutral={setNeutralHandler} onClickGood={setGoodHandler}/>
       <Header text='statistics' />
       <table><Statistics good={good} neutral={neutral} bad={bad} /></table> */}
+      <Header text='Anecdote of the day' />
       {anecdotes[selected]} <br />
       <DisplayPoints points={points[selected]}/>
       <Button onClick={setPointsHandler} text='vote'/>
       <Button onClick={setSelectedHandler} text='next anecdote'/>
+      <Header text='Anecdote with most votes' />
+      {anecdotes[maxVotesIndex]} <br />
+      <DisplayPoints points={points[maxVotesIndex]} />
     </div>
   )
 }
