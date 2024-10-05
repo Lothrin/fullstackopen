@@ -1,68 +1,59 @@
-const Header = (course) => {
-  console.log(course);
-  return (
-    <>
-      <h1>{course.course.name}</h1>
-    </>
-  );
-};
+import { useState } from 'react'
 
-const Part = (part) => {
-  console.log(part);
+const Header = (props) => {
   return (
-    <>
-      <p>
-        {part.name} = {part.exercises}
-      </p>
-    </>
-  );
-};
+    <h1>
+      {props.text}
+    </h1>
+  )
+}
 
-const Content = (parts) => {
+const Button = (props) => {
   return (
     <>
-      <Part name={parts.parts[0].name} exercises={parts.parts[0].exercises} />
-      <Part name={parts.parts[1].name} exercises={parts.parts[1].exercises} />
-      <Part name={parts.parts[2].name} exercises={parts.parts[2].exercises} />
+    <button onClick={props.onClick}>
+      {props.text}
+    </button>
     </>
-  );
-};
+  )
+}
 
-const Total = (parts) => {
-  console.log(parts);
+const Display = (props) => {
   return (
-    <>
-      <p>Number of exercises = {parts.parts[0].exercises + parts.parts[1].exercises + parts.parts[2].exercises}</p>
-    </>
-  );
-};
+    <p>
+      {props.text} = {props.value}
+    </p>
+  )
+}
+
 
 const App = () => {
-  const course = {
-    name:'Half Stack application development',
-    parts : [
-    {
-      name: 'Fundamentals of React',
-      exercises: 10
-    },
-    {
-      name: 'Using props to pass data',
-      exercises: 7
-    },
-    {
-      name: 'State of a component',
-      exercises: 14
-    },
-  ]
-};
-
+  // save clicks of each button to its own state
+  const [good, setGood] = useState(0)
+  const [neutral, setNeutral] = useState(0)
+  const [bad, setBad] = useState(0)
+  
+  const setGoodHandler = () => {
+    setGood(good + 1)
+  }
+  const setNeutralHandler = () => {
+    setNeutral(neutral + 1)
+  }
+  const setBadHandler = () => {
+    setBad(bad + 1)
+  }
   return (
     <div>
-      <Header course={course} />
-      <Content parts={course.parts} />
-      <Total parts={course.parts} />
+      <Header text='give feedback'/>
+      <Button onClick={setGoodHandler} text='good'/>
+      <Button onClick={setNeutralHandler} text='neutral'/>
+      <Button onClick={setBadHandler} text='bad'/>
+      <Header text='statistics'/>
+      <Display text='good' value={good}/>
+      <Display text='neutral' value={neutral}/>
+      <Display text='bad' value={bad}/>
     </div>
-  );
-};
+  )
+}
 
-export default App;
+export default App
