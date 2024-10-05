@@ -11,14 +11,14 @@ const Header = (props) => {
 const Button = (props) => {
   return (
     <>
-      <button onClick={props.onClick}>
-        {props.text}
-      </button>
+    <button onClick={props.onClickGood}>Good</button>
+    <button onClick={props.onClickNeutral}>Neutral</button>
+    <button onClick={props.onClickBad}>Bad</button>
     </>
   )
 }
 
-const Display = (props) => {
+const StatisticLine = (props) => {
   return (
     <p>
       {props.text}  {props.value}
@@ -30,18 +30,18 @@ const Statistics = (props) => {
   if (props.good + props.neutral + props.bad == 0) { 
     return (
     <>
-    <Display text='No feedback given'/>
+    <StatisticLine text='No feedback given'/>
     </>
   ) 
 } 
   return (
     <>
-      <Display text='good' value={props.good} />
-      <Display text='neutral' value={props.neutral} />
-      <Display text='bad' value={props.bad} />
-      <Display text='all' value={props.good + props.neutral + props.bad} />
-      <Display text='average' value={(props.good - props.bad) / (props.good + props.neutral + props.bad)} />
-      <Display text='positive' value={props.good / (props.good + props.neutral + props.bad) * 100 + '%'} />
+      <StatisticLine text='good' value={props.good} />
+      <StatisticLine text='neutral' value={props.neutral} />
+      <StatisticLine text='bad' value={props.bad} />
+      <StatisticLine text='all' value={props.good + props.neutral + props.bad} />
+      <StatisticLine text='average' value={(props.good - props.bad) / (props.good + props.neutral + props.bad)} />
+      <StatisticLine text='positive' value={props.good / (props.good + props.neutral + props.bad) * 100 + '%'} />
     </>
   )
 }
@@ -62,12 +62,11 @@ const App = () => {
   const setBadHandler = () => {
     setBad(bad + 1)
   }
+
   return (
     <div>
       <Header text='give feedback' />
-      <Button onClick={setGoodHandler} text='good' />
-      <Button onClick={setNeutralHandler} text='neutral' />
-      <Button onClick={setBadHandler} text='bad' />
+      <Button onClickBad={setBadHandler} onClickNeutral={setNeutralHandler} onClickGood={setGoodHandler}/>
       <Header text='statistics' />
       <Statistics good={good} neutral={neutral} bad={bad} />
     </div>
