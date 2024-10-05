@@ -57,8 +57,21 @@ import { useState } from 'react'
 const Button = (props) => {
   return (
     <>
-    <br />
-    <button onClick={props.onClick}>next anecdote </button>
+    <button onClick={props.onClick}>{props.text}</button>
+    </>
+  )
+}
+const DisplayPoints = (props) => {
+  if (props.points == 0) { 
+       return (
+       <>
+       <p></p>
+       </>
+     ) 
+   } 
+  return (
+    <>
+    <p>has {props.points} votes</p>
     </>
   )
 }
@@ -91,8 +104,18 @@ const App = () => {
   ]
  
   const [selected, setSelected] = useState(0)
+  const [points, setPoints] = useState(new Uint8Array(anecdotes.length))
   const setSelectedHandler = () => {
     setSelected(Math.floor(Math.random() * anecdotes.length))
+    console.log(selected)
+   
+  }
+  
+  const setPointsHandler = () => {
+    const copy = [...points]
+    copy[selected] +=1
+    setPoints(copy)
+    
   }
   return (
     <div>
@@ -100,8 +123,10 @@ const App = () => {
       <Button onClickBad={setBadHandler} onClickNeutral={setNeutralHandler} onClickGood={setGoodHandler}/>
       <Header text='statistics' />
       <table><Statistics good={good} neutral={neutral} bad={bad} /></table> */}
-      {anecdotes[selected]}
-      <Button onClick={setSelectedHandler}/>
+      {anecdotes[selected]} <br />
+      <DisplayPoints points={points[selected]}/>
+      <Button onClick={setPointsHandler} text='vote'/>
+      <Button onClick={setSelectedHandler} text='next anecdote'/>
     </div>
   )
 }
