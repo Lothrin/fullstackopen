@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
 import  Filter  from './components/filter'
 import PersonForm from './components/form'
 import PersonList from './components/person_list'
+import personService from './services/persons'
 
 const App = () => {
   const [persons, setPersons] = useState([]) 
@@ -11,13 +11,11 @@ const App = () => {
   const [searchPersons, setSearch] = useState('')
 
   useEffect(() => {
-    console.log('effect')
-    axios
-      .get('http://localhost:3002/persons')
-      .then(response => {
-        console.log('promise fulfilled')
-        setPersons(response.data)
-      })
+    personService
+    .getAll()
+    .then(initialPersons => {
+      setPersons(initialPersons)
+    })
   }, [])
 
 
@@ -27,25 +25,34 @@ const App = () => {
 
   const displayPersons = searchPersons ? filterPersons : persons;
 
+
   const addPerson = (event) => {
-    event.preventDefault()
+    event.preventDefault();
+    
     const personObject = {
       name: newPerson,
       number: newPersonNumber
-    }
-
+    };
+  
     const personExists = persons.some(person => person.name === newPerson);
     console.log(personExists);
-
+  
     if (!personExists) {
-
-    setPersons(persons.concat(personObject))
-    setNewPerson('')
-    setNewPersonNumber('')}
-    else {
-      alert(`${newPerson} is already added to phonebook`)
+      personService
+        .create(personObject)
+        .then(returnedPerson => {
+          setPersons(persons.concat(returnedPerson)); 
+          setNewPerson('');
+          setNewPersonNumber(''); 
+        })
+        .catch(error => {
+          console.error("Error adding person:", error); 
+        });
+    } else {
+      alert(`${newPerson} is already added to phonebook`);
     }
-    }
+  };
+  
 
   const handlePersonChange = (event) => {
     console.log(event.target.value)
@@ -60,6 +67,16 @@ const App = () => {
     console.log(event.target.value)
     setSearch(event.target.value)
   }
+
+  const deletePerson = (id) => {
+    personService.deletePerson(id)
+      .then(() => {
+        setPersons(persons.filter(person => person.id !== id));
+      })
+      .catch(error => {
+        console.error("Error deleting person:", error);
+      });
+  };
   return (
     <div>
       <h2>Phonebook</h2>
@@ -73,7 +90,7 @@ const App = () => {
         addPerson={addPerson} 
       />
       <h3>Numbers</h3>
-      <PersonList displayPersons={displayPersons} />
+      <PersonList displayPersons={displayPersons} deletePerson={deletePerson} />
     </div>
   )
 }
