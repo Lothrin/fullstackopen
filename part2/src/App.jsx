@@ -28,13 +28,13 @@ const App = () => {
 
   const addPerson = (event) => {
     event.preventDefault();
-    
+  
     const personObject = {
       name: newPerson,
       number: newPersonNumber
     };
   
-    const personExists = persons.some(person => person.name === newPerson);
+    const personExists = persons.find(person => person.name === newPerson);
     console.log(personExists);
   
     if (!personExists) {
@@ -49,7 +49,30 @@ const App = () => {
           console.error("Error adding person:", error); 
         });
     } else {
-      alert(`${newPerson} is already added to phonebook`);
+     
+      const confirmUpdate = window.confirm(`"${newPerson}" is already in the phonebook. Do you want to update the number?`);
+      
+      if (confirmUpdate) {
+        const updatedPersonObject = {
+          ...personExists,
+          number: newPersonNumber
+        };
+  
+        personService
+          .update(personExists.id, updatedPersonObject)
+          .then(returnedPerson => {
+            setPersons(persons.map(person => person.id !== personExists.id ? person : returnedPerson));
+            setNewPerson('');
+            setNewPersonNumber('');
+          })
+          .catch(error => {
+            console.error("Error updating person:", error);
+          });
+      } else {
+
+        setNewPerson('');
+        setNewPersonNumber('');
+      }
     }
   };
   
@@ -68,14 +91,17 @@ const App = () => {
     setSearch(event.target.value)
   }
 
-  const deletePerson = (id) => {
-    personService.deletePerson(id)
-      .then(() => {
-        setPersons(persons.filter(person => person.id !== id));
-      })
-      .catch(error => {
-        console.error("Error deleting person:", error);
-      });
+  const deletePerson = (id, personName) => {
+    const confirmDelete = window.confirm(`Are you sure you want to delete ${personName}?`);
+    if (confirmDelete) {
+      personService.deletePerson(id)
+        .then(() => {
+          setPersons(persons.filter(person => person.id !== id));
+        })
+        .catch(error => {
+          console.error("Error deleting person:", error);
+        });
+    }
   };
   return (
     <div>
