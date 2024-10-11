@@ -10,7 +10,7 @@ const App = () => {
   const [newPerson, setNewPerson] = useState('')
   const [newPersonNumber, setNewPersonNumber] = useState('')
   const [searchPersons, setSearch] = useState('')
-  const [notification, setNotification] = useState(null)
+  const [notification, setNotification] = useState({message: null, isError: false})
 
   useEffect(() => {
     personService
@@ -47,14 +47,34 @@ const App = () => {
           setNewPerson('');
           setNewPersonNumber(''); 
           setNotification(
-            `${personObject.name} is successfully added to the list`
+            {
+              message: `${personObject.name} is successfully added to the list`,
+              isError: false
+            }
           )
           setTimeout(() => {
-            setNotification(null)
+            setNotification(
+              {
+                message: null,
+                isError: false
+              })
           }, 5000)
         })
         .catch(error => {
-          console.error("Error adding person:", error); 
+          console.error("Error adding person:", error);
+          setNotification(
+            {
+              message: `Error adding ${personObject.name} to the list`,
+              isError: true
+            }
+          )
+          setTimeout(() => {
+            setNotification(
+              {
+                message: null,
+                isError: false
+              })
+          }, 5000) 
         });
     } else {
      
@@ -73,14 +93,34 @@ const App = () => {
             setNewPerson('');
             setNewPersonNumber('');
             setNotification(
-              `Telephone number "${updatedPersonObject.number}" for ${updatedPersonObject.name} is successfully updated`
+              {
+                message:`Telephone number "${updatedPersonObject.number}" for ${updatedPersonObject.name} is successfully updated`,
+                isError: false,
+              }
             )
             setTimeout(() => {
-              setNotification(null)
+              setNotification(
+                {
+                  message: null,
+                  isError: false
+                })
             }, 5000)
           })
           .catch(error => {
             console.error("Error updating person:", error);
+            setNotification(
+              {
+                message:`Error updating person`,
+                isError: true,
+              }
+            )
+            setTimeout(() => {
+              setNotification(
+                {
+                  message: null,
+                  isError: false
+                })
+            }, 5000)
           });
       } else {
 
@@ -111,22 +151,38 @@ const App = () => {
       personService.deletePerson(id)
         .then(() => {
           setPersons(persons.filter(person => person.id !== id));
-          setNotification(
-            `${personName} is successfully deleted`
-          )
+          setNotification({
+            message: `${personName} is successfully deleted`,
+            isError: false,
+          })
           setTimeout(() => {
-            setNotification(null)
+            setNotification(
+              {
+                message: null,
+                isError: false
+              })
           }, 5000)
         })
         .catch(error => {
           console.error("Error deleting person:", error);
+          setNotification({
+            message: `Error deleting ${personName}`,
+            isError: true,
+          })
+          setTimeout(() => {
+            setNotification(
+              {
+                message: null,
+                isError: false
+              })
+          }, 5000)
         });
     }
   };
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message={notification} />
+      <Notification notification={notification} />
     <Filter handleSearch={handleSearch}/>
       <h3>Add a new person</h3>
       <PersonForm 
