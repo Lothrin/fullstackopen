@@ -5,8 +5,8 @@ const App = () => {
   const [searchCountry, setSearch] = useState('')
   const [allCountries, setAllCountries] = useState([]) 
   const [filteredCountries, setFilteredCountries] = useState([]) 
-
- 
+  const [selectedCountry, setSelectedCountry] = useState(null)
+    
   useEffect(() => {
     axios
       .get('https://studies.cs.helsinki.fi/restcountries/api/all')
@@ -63,12 +63,15 @@ const App = () => {
           {filteredCountries.map(country => (
             <li key={country.name.common}>
               {country.name.common}
+              <button onClick={() => setSelectedCountry(country)}>show</button>
             </li>
+            
           ))}
         </ul>
       )}
 
       {filteredCountries.length === 1 && renderCountryDetails(filteredCountries[0])}
+      {selectedCountry && renderCountryDetails(selectedCountry)}
     </div>
   )
 }
