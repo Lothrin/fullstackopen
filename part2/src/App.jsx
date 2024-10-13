@@ -1,199 +1,74 @@
 import { useState, useEffect } from 'react'
-import  Filter  from './components/filter'
-import PersonForm from './components/form'
-import PersonList from './components/person_list'
-import personService from './services/persons'
-import Notification from './components/notification'
+import axios from 'axios'
 
 const App = () => {
-  const [persons, setPersons] = useState([]) 
-  const [newPerson, setNewPerson] = useState('')
-  const [newPersonNumber, setNewPersonNumber] = useState('')
-  const [searchPersons, setSearch] = useState('')
-  const [notification, setNotification] = useState({message: null, isError: false})
+  const [searchCountry, setSearch] = useState('')
+  const [allCountries, setAllCountries] = useState([]) 
+  const [filteredCountries, setFilteredCountries] = useState([]) 
 
+ 
   useEffect(() => {
-    personService
-    .getAll()
-    .then(initialPersons => {
-      setPersons(initialPersons)
-    })
+    axios
+      .get('https://studies.cs.helsinki.fi/restcountries/api/all')
+      .then(response => {
+        setAllCountries(response.data)
+      })
+      .catch(error => {
+        console.error('Error fetching country data:', error)
+      })
   }, [])
 
 
-  const filterPersons = persons.filter(person =>
-    person.name.toLowerCase().includes(searchPersons.toLowerCase())
-  );
-
-  const displayPersons = searchPersons ? filterPersons : persons;
-
-
-  const addPerson = (event) => {
-    event.preventDefault();
-  
-    const personObject = {
-      name: newPerson,
-      number: newPersonNumber
-    };
-  
-    const personExists = persons.find(person => person.name === newPerson);
-    console.log(personExists);
-  
-    if (!personExists) {
-      personService
-        .create(personObject)
-        .then(returnedPerson => {
-          setPersons(persons.concat(returnedPerson)); 
-          setNewPerson('');
-          setNewPersonNumber(''); 
-          setNotification(
-            {
-              message: `${personObject.name} is successfully added to the list`,
-              isError: false
-            }
-          )
-          setTimeout(() => {
-            setNotification(
-              {
-                message: null,
-                isError: false
-              })
-          }, 5000)
-        })
-        .catch(error => {
-          console.error("Error adding person:", error);
-          setNotification(
-            {
-              message: `Error adding ${personObject.name} to the list`,
-              isError: true
-            }
-          )
-          setTimeout(() => {
-            setNotification(
-              {
-                message: null,
-                isError: false
-              })
-          }, 5000) 
-        });
+  useEffect(() => {
+    if (searchCountry) {
+      const filtered = allCountries.filter(country =>
+        country.name.common.toLowerCase().includes(searchCountry.toLowerCase())
+      )
+      setFilteredCountries(filtered)
     } else {
-     
-      const confirmUpdate = window.confirm(`"${newPerson}" is already in the phonebook. Do you want to update the number?`);
-      
-      if (confirmUpdate) {
-        const updatedPersonObject = {
-          ...personExists,
-          number: newPersonNumber
-        };
-  
-        personService
-          .update(personExists.id, updatedPersonObject)
-          .then(returnedPerson => {
-            setPersons(persons.map(person => person.id !== personExists.id ? person : returnedPerson));
-            setNewPerson('');
-            setNewPersonNumber('');
-            setNotification(
-              {
-                message:`Telephone number "${updatedPersonObject.number}" for ${updatedPersonObject.name} is successfully updated`,
-                isError: false,
-              }
-            )
-            setTimeout(() => {
-              setNotification(
-                {
-                  message: null,
-                  isError: false
-                })
-            }, 5000)
-          })
-          .catch(error => {
-            console.error("Error updating person:", error);
-            setNotification(
-              {
-                message:`Error updating person`,
-                isError: true,
-              }
-            )
-            setTimeout(() => {
-              setNotification(
-                {
-                  message: null,
-                  isError: false
-                })
-            }, 5000)
-          });
-      } else {
-
-        setNewPerson('');
-        setNewPersonNumber('');
-      }
+      setFilteredCountries([]) 
     }
-  };
-  
-
-  const handlePersonChange = (event) => {
-    console.log(event.target.value)
-    setNewPerson(event.target.value)
-  }
-  const handlePersonNumberChange = (event) => {
-    console.log(event.target.value)
-    setNewPersonNumber(event.target.value)
-  }
+  }, [searchCountry, allCountries])
 
   const handleSearch = (event) => {
-    console.log(event.target.value)
     setSearch(event.target.value)
   }
 
-  const deletePerson = (id, personName) => {
-    const confirmDelete = window.confirm(`Are you sure you want to delete ${personName}?`);
-    if (confirmDelete) {
-      personService.deletePerson(id)
-        .then(() => {
-          setPersons(persons.filter(person => person.id !== id));
-          setNotification({
-            message: `${personName} is successfully deleted`,
-            isError: false,
-          })
-          setTimeout(() => {
-            setNotification(
-              {
-                message: null,
-                isError: false
-              })
-          }, 5000)
-        })
-        .catch(error => {
-          console.error("Error deleting person:", error);
-          setNotification({
-            message: `Error deleting ${personName}`,
-            isError: true,
-          })
-          setTimeout(() => {
-            setNotification(
-              {
-                message: null,
-                isError: false
-              })
-          }, 5000)
-        });
-    }
-  };
+  const renderCountryDetails = (country) => {
+    return (
+      <div>
+        <h2>{country.name.common}</h2>
+        <p>capital: {country.capital}</p>
+        <p>area: {country.area}</p>
+        <h3>languages:</h3>
+        <ul>
+          {Object.values(country.languages).map(lang => (
+            <li key={lang}>{lang}</li>
+          ))}
+        </ul>
+        <img src={country.flags.png} alt={`Flag of ${country.name.common}`} width={150} />
+      </div>
+    )
+  }
+
   return (
     <div>
-      <h2>Phonebook</h2>
-      <Notification notification={notification} />
-    <Filter handleSearch={handleSearch}/>
-      <h3>Add a new person</h3>
-      <PersonForm 
-        newPerson={newPerson} 
-        newPersonNumber={newPersonNumber} 
-        handlePersonChange={handlePersonChange} 
-        handlePersonNumberChange={handlePersonNumberChange} 
-        addPerson={addPerson} 
-      />
-      <h3>Numbers</h3>
-      <PersonList displayPersons={displayPersons} deletePerson={deletePerson} />
+      <h2>Find countries</h2>
+      Country Name: <input onChange={handleSearch} value={searchCountry} />
+
+      {filteredCountries.length > 10 && <p>Too many matches, specify another filter</p>}
+
+      {filteredCountries.length <= 10 && filteredCountries.length > 1 && (
+        <ul>
+          {filteredCountries.map(country => (
+            <li key={country.name.common}>
+              {country.name.common}
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {filteredCountries.length === 1 && renderCountryDetails(filteredCountries[0])}
     </div>
   )
 }
